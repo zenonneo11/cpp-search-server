@@ -61,7 +61,7 @@ public:
         const vector<string> words = SplitIntoWordsNoStop(document);
         for (const auto& word:words){
                 word_to_document_freqs_[word][document_id]+=(1.0/words.size());
-                //cout<<document_id<<":"<<word<<": "<<word_to_document_freqs_[word][document_id]<<endl;
+               
         }
         
     }
