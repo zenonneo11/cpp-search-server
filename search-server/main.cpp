@@ -10,6 +10,7 @@
 using namespace std;
 
 const int MAX_RESULT_DOCUMENT_COUNT = 5;
+const double EPSILON = 1e-6;
 
 string ReadLine() {
     string s;
@@ -90,7 +91,7 @@ public:
 
         sort(matched_documents.begin(), matched_documents.end(),
             [](const Document& lhs, const Document& rhs) {
-                if (abs(lhs.relevance - rhs.relevance) < 1e-6) {
+                if (abs(lhs.relevance - rhs.relevance) < EPSILON) {
                     return lhs.rating > rhs.rating;
                 }
                 else {
@@ -225,7 +226,7 @@ private:
         }
 
         for (const string& word : query.minus_words) {
-            if (word_to_document_freqs_.count(word) == 0) { 
+            if (word_to_document_freqs_.count(word) == 0) {
                 continue;
             }
             for (const auto [document_id, _] : word_to_document_freqs_.at(word)) {
@@ -237,7 +238,7 @@ private:
         for (const auto [document_id, relevance] : document_to_relevance) {
             matched_documents.push_back({ document_id, relevance, documents_.at(document_id).rating });
         }
-    return matched_documents;
+        return matched_documents;
     }
 };
 
