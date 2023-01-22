@@ -57,8 +57,6 @@ enum class DocumentStatus {
     REMOVED,
 };
 
-auto default_predicate = [](int document_id, DocumentStatus status, int rating) { return status == DocumentStatus::ACTUAL; };
-
 class SearchServer {
 public:
     void SetStopWords(const string& text) {
@@ -78,22 +76,11 @@ public:
     }
 
     vector<Document> FindTopDocuments(const string& raw_query) const {
-        return FindTopDocuments(raw_query, default_predicate);
+        return FindTopDocuments(raw_query, DocumentStatus::ACTUAL);
     }
 
-    vector<Document> FindTopDocuments(const string& raw_query, DocumentStatus status) const {
-        switch (status) {
-        case DocumentStatus::ACTUAL:
-            return FindTopDocuments(raw_query, [](int document_id, DocumentStatus status, int rating) { return status == DocumentStatus::ACTUAL; });
-        case DocumentStatus::IRRELEVANT:
-            return FindTopDocuments(raw_query, [](int document_id, DocumentStatus status, int rating) { return status == DocumentStatus::IRRELEVANT; });
-        case DocumentStatus::BANNED:
-            return FindTopDocuments(raw_query, [](int document_id, DocumentStatus status, int rating) { return status == DocumentStatus::BANNED; });
-        case DocumentStatus::REMOVED:
-            return FindTopDocuments(raw_query, [](int document_id, DocumentStatus status, int rating) { return status == DocumentStatus::REMOVED; });
-        default:
-            return FindTopDocuments(raw_query, default_predicate);
-        }
+    vector<Document> FindTopDocuments(const string& raw_query, DocumentStatus doc_status) const {
+        return FindTopDocuments(raw_query, [doc_status](int document_id, DocumentStatus status, int rating) { return status == doc_status; });
     }
 
     template <typename Predicate>
@@ -238,7 +225,7 @@ private:
         }
 
         for (const string& word : query.minus_words) {
-            if (word_to_document_freqs_.count(word) == 0) {
+            if (word_to_document_freqs_.count(word) == 0) { 
                 continue;
             }
             for (const auto [document_id, _] : word_to_document_freqs_.at(word)) {
