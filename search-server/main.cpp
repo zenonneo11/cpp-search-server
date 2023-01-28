@@ -1,6 +1,3 @@
-
-
-
 template <typename T, typename U>
 void AssertEqualImpl(const T& t, const U& u, const string& t_str, const string& u_str, const string& file,
     const string& func, unsigned line, const string& hint) {
@@ -199,22 +196,38 @@ void TestStatus() {
     const int doc_id1 = 1;
     const int doc_id2 = 2;
     const int doc_id3 = 3;
+    const int doc_id4 = 4;
+    const int doc_id5 = 5;
     const string content1 = "wild cat big walk in the words"s;
     const string content2 = "not all heroes wear city capes"s;
     const string content3 = "minus words not easy at big all"s;
+    const string content4 = "good old days in da city"s;
+    const string content5 = "asta la vista baby"s;
     const vector<int> ratings1 = { 18, 3, 4 };
     const vector<int> ratings2 = { 7, 11, 4 };
     const vector<int> ratings3 = { 7, 11, 4 };
+    const vector<int> ratings4 = { 1, 15, 2 };
+    const vector<int> ratings5 = { 1, 1, 3 };
     {
         SearchServer server;
         server.AddDocument(doc_id1, content1, DocumentStatus::ACTUAL, ratings1);
-        server.AddDocument(doc_id2, content2, DocumentStatus::ACTUAL, ratings2);
+        server.AddDocument(doc_id2, content2, DocumentStatus::IRRELEVANT, ratings2);
         server.AddDocument(doc_id3, content3, DocumentStatus::BANNED, ratings3);
+        server.AddDocument(doc_id4, content4, DocumentStatus::ACTUAL, ratings4);
+        server.AddDocument(doc_id5, content5, DocumentStatus::REMOVED, ratings5);
         auto found_docs = server.FindTopDocuments("city words -big", DocumentStatus::ACTUAL);
         ASSERT_EQUAL(found_docs.size(), 1);
         found_docs = server.FindTopDocuments("city words", DocumentStatus::BANNED);
         ASSERT_EQUAL(found_docs[0].id, doc_id3);
+        ASSERT_EQUAL(found_docs.size(), 1);
+        found_docs = server.FindTopDocuments("city heroes", DocumentStatus::IRRELEVANT);
+        ASSERT_EQUAL(found_docs[0].id, doc_id2);
+        ASSERT_EQUAL(found_docs.size(), 1);
+        found_docs = server.FindTopDocuments("baby", DocumentStatus::REMOVED);
+        ASSERT_EQUAL(found_docs[0].id, doc_id5);
+        ASSERT_EQUAL(found_docs.size(), 1);
     }
+
 }
 
 
