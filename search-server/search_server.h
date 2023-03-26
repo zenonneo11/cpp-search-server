@@ -7,6 +7,7 @@
 #include <utility>
 #include "document.h"
 #include "string_processing.h"
+#include "log_duration.h"
 
 extern const int MAX_RESULT_DOCUMENT_COUNT;
 extern const double EPSILON;
@@ -75,7 +76,8 @@ SearchServer::SearchServer(const StringContainer& stop_words)
 }
 
 template <typename DocumentPredicate>
-std::vector<Document> SearchServer::FindTopDocuments(const std::string& raw_query, DocumentPredicate document_predicate) const {      
+std::vector<Document> SearchServer::FindTopDocuments(const std::string& raw_query, DocumentPredicate document_predicate) const {
+    LOG_DURATION_STREAM("Operation time",std::cout);
     const Query query = ParseQuery(raw_query);
     auto matched_documents = FindAllDocuments(query, document_predicate);
     std::sort(matched_documents.begin(), matched_documents.end(),
