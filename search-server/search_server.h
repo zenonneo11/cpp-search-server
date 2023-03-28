@@ -20,13 +20,20 @@ public:
     explicit SearchServer(const std::string& stop_words_text);
 
     void AddDocument(int document_id, const std::string& document, DocumentStatus status, const std::vector<int>& ratings);
-
+    void RemoveDocument(int document_id);
+    
+    using It = std::set<int>::const_iterator;
+    It begin();
+    It end();
+    
     template <typename DocumentPredicate>
     std::vector<Document> FindTopDocuments(const std::string& raw_query, DocumentPredicate document_predicate) const;
     std::vector<Document> FindTopDocuments(const std::string& raw_query, DocumentStatus status) const;
     std::vector<Document> FindTopDocuments(const std::string& raw_query) const;
 
-    int GetDocumentId(int index) const;
+    //int GetDocumentId(int index) const;
+    
+    const std::map<std::string, double>& GetWordFrequencies(int document_id) const;
 
     int GetDocumentCount() const;
 
@@ -40,8 +47,11 @@ private:
     
     const std::set<std::string> stop_words_;
     std::map<std::string, std::map<int, double>> word_to_document_freqs_;
+    std::map<int, std::map<std::string, double>> document_id_to_word_freqs_;
     std::map<int, DocumentData> documents_;
     std::map<size_t, int> doc_index_to_id;
+    std::set<int> all_doc_id_;
+    std::map<std::string, double> words_to_freq_empty_map_;
     
     bool IsStopWord(const std::string& word) const;
     std::vector<std::string> SplitIntoWordsNoStop(const std::string& text) const;
@@ -77,7 +87,7 @@ SearchServer::SearchServer(const StringContainer& stop_words)
 
 template <typename DocumentPredicate>
 std::vector<Document> SearchServer::FindTopDocuments(const std::string& raw_query, DocumentPredicate document_predicate) const {
-    LOG_DURATION_STREAM("Operation time",std::cout);
+   // LOG_DURATION_STREAM("Operation time", std::cout);
     const Query query = ParseQuery(raw_query);
     auto matched_documents = FindAllDocuments(query, document_predicate);
     std::sort(matched_documents.begin(), matched_documents.end(),

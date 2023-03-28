@@ -20,7 +20,7 @@ struct Range{
         return range_end_;
     }
 
-    size_t size()const {
+    size_t size() const {
         return std::distance(range_begin_, range_end_);
     }
 };
@@ -28,17 +28,18 @@ struct Range{
 template <typename It>
 std::ostream& operator<<(std::ostream& os,const Range<It>& range){
     for (auto el : range) {
-        os <<el;
+        os << el;
     }
     return os;
 }
+
 
 template <typename It>
 struct Paginator{
     Paginator(It range_begin, It range_end, size_t page_size) {
         while(range_begin != range_end) {
             size_t dist = std::distance(range_begin, range_end);
-            pages_.push_back(Range(range_begin, std::next(range_begin, std::min(page_size,dist ))));
+            pages_.push_back(Range(range_begin, std::next(range_begin, std::min(page_size, dist))));
             std::advance(range_begin, std::min(page_size, dist));
         }
     }
@@ -53,6 +54,7 @@ struct Paginator{
 
     std::vector <Range<It>> pages_;
 };
+
 
 template <typename Container>
 auto Paginate(const Container& c, size_t page_size) {
